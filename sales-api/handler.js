@@ -29,18 +29,50 @@ app.post("/checkout", connectDb, async (req, res, next) => {
     getProduct('CP-502101')
   )
   if (result.length > 0) {
+    
     const product = result[0]
-    if (product.stock > 0) {
-      await req.conn.query(setStock(product.product_id, product.stock - 1))
-      return res.status(200).json({ message: `구매 완료! 남은 재고: ${product.stock - 1}`});
+    if (product.stock >= 0 && product.stock >= req.body.stock) {
+      await req.conn.query(setStock(product.product_id, product.stock - req.body.stock))
+      return res.status(200).json({ message: `구매 완료! 남은 재고: ${product.stock - req.body.stock}`});
     }
     else {
       await req.conn.end()
-      return res.status(200).json({ message: `구매 실패! 남은 재고: ${product.stock}`});
+      console.log(req.body)
+      const now = new Date().toString()
+      const message = `도너츠 재고가 없습니다. 제품을 생산해주세요! \n메시지 작성 시각: ${now}`
+      const params = {
+        Message: message,
+        Subject: '도너츠 재고 부족',
+        MessageAttributes: {
+          MessageAttributeProductId: {
+            StringValue: product.product_id,
+            DataType: "String",
+          },
+          MessageAttributeFactoryId: {
+            StringValue: req.body.MessageAttributeFactoryId,
+            DataType: "String",
+          },
+          MessageAttributeProductCnt: {
+            StringValue: `${req.body.stock}`,
+            DataType: "Number",
+          },
+          MessageAttributeRequester: {
+            StringValue: req.body.requester,
+            DataType: "String",
+          }
+        },
+        TopicArn: process.env.TOPIC_ARN
+}
+console.log("보내는 메시지 결과물 : ", params)
+
+      await sns.publish(params).promise()
+      return res.status(200).json({ message: `구매 실패! 남은 재고: ${product.stock}, 생산요청 진행중`});
+        
     }
   } else {
     await req.conn.end()
     return res.status(400).json({ message: "상품 없음" });
+    
   }
 });
 
@@ -49,6 +81,10 @@ app.use((req, res, next) => {
     error: "Not Found",
   });
 });
+
+
+
+
 
 module.exports.handler = serverless(app);
 module.exports.app = app;

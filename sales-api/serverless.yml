@@ -5,9 +5,18 @@ provider:
   name: aws
   runtime: nodejs14.x
   region: ap-northeast-2
+  environment:
+    DB_HOSTNAME: project3db2.cpajpop7ewnt.ap-northeast-2.rds.amazonaws.com
+    DB_USERNAME: team11
+    DB_PASSWORD: team11
+    DB_DATABASE: team11
+    TOPIC_ARN: arn:aws:sns:ap-northeast-2:124121153800:stock-lambda
+
+
 
 functions:
   api:
     handler: handler.handler
     events:
       - httpApi: '*'
+
