@@ -24,6 +24,7 @@ app.get("/product/donut", connectDb, async (req, res, next) => {
   }
 });
 
+
 app.post("/checkout", connectDb, async (req, res, next) => {
   const [ result ] = await req.conn.query(
     getProduct('CP-502101')
