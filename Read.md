@@ -15,7 +15,8 @@
 
 ---
 
-![11팀 (2)](https://github.com/cs-devops-bootcamp/devops-04-Final-Team1/assets/127801771/e100535b-e7a9-4daa-9eda-9ff1504bc716)
+
+![11팀 drawio (1)](https://github.com/leesanghoon94/project3-msa/assets/127801771/e30b50c4-9265-4435-b53c-20e4719f632a)
 
 
 ---
